@@ -1,0 +1,46 @@
+{
+    "website": {
+        "value": "https://nvidia.net.hilan.co.il/login",
+        "description": "(REQUIRED) The address of the login page"
+    },
+    "username": {
+        "value": "12345",
+        "description": "(REQUIRED) User name"
+    },
+    "password": {
+        "value": "*******",
+        "description": "(REQUIRED) Hilan password"
+    },
+    "is_last_month": {
+        "value": "False",
+        "description": "set to true if you fill hours for last month"
+    },
+    "presence": {
+        "value": "0",
+        "description": "type of presence, requires the value on Hilan source code. HINT(presence=0, w.home="
+    },
+    "start_time": {
+        "value": "09:00",
+        "description": "Default start time"
+    },
+    "min_hours": {
+        "value": "9",
+        "description": "Minimal number of working hours"
+    },
+    "project_code": {
+        "value": "69146",
+        "description": "The name of the project to fill"
+    },
+    "is_random": {
+        "value": "True",
+        "description": "Add randomization in hours"
+    },
+    "start_time_distribution": {
+        "value": "[0.2, 0.6, 0.1, 0.1]",
+        "description": "List of probabilities (earlier and later than 'start_time', steps of .5h)"
+    },
+    "hours_distribution": {
+        "value": "[0.8, 0.1, 0.1]",
+        "description": "List of probabilities (later than min_hours, steps of .5h)"
+    }
+}

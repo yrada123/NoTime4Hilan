@@ -1,0 +1,44 @@
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# IDEs and editors
+.idea/
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Test output
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Logs
+*.log
+
+# Build directories
+build/
+dist/
+*.egg-info/
+
+# Environment variables file (for sensitive information like API keys)
+.env
+
+# PyInstaller
+*.spec
+
+# SQLite databases
+*.db
+*.sqlite
