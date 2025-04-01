@@ -1,7 +1,11 @@
+import time
+
 from login import login
 from navigate import navigate_to_page
 from filler import select_dates, fill_info
 import json
+import traceback
+import ctypes
 
 defaults = {"is_last_month" : 'False',
             "presence" : "0",
@@ -23,7 +27,9 @@ def load_config(filename="conf.json"):
             if key not in conf.keys():
                 raise Exception(key + ' key is required and is not specified in conf.json')
     except:
-        raise Exception('Failed to read ' + filename)
+        err_msg = f"Exception: Failed to read {filename}\n\nTraceback:\n{traceback.format_exc()}"
+        ctypes.windll.user32.MessageBoxW(0, err_msg, "Error", 0x10)
+        raise Exception(err_msg)
 
     for key in defaults.keys():
         if key not in conf.keys():
@@ -36,7 +42,15 @@ def main():
     driver = login(conf)
     navigate_to_page(driver)
     select_dates(driver, conf)
+    time.sleep(6)
     fill_info(driver, conf)
+
+    finish_msg = '''
+                Yup, so that bs app works.\n 
+                May you never waste your time again!\n
+                (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧
+                '''
+    ctypes.windll.user32.MessageBoxW(0, finish_msg, "Information", 0x40)
 
 if __name__ == "__main__":
     main()

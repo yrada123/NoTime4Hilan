@@ -1,4 +1,6 @@
 import json
+import ctypes
+import traceback
 from random import choices
 
 from selenium.webdriver.common.keys import Keys
@@ -73,7 +75,13 @@ def fill_time_field(elm, text):
 
 # filling selected days info
 def fill_info(driver, conf):
-    hours_div = driver.find_elements(By.ID, "MainDiv")[0]
+    try:
+        hours_div = driver.find_elements(By.ID, "MainDiv")[0]
+    except Exception as e:
+        err_msg = f"Exception: Failed while trying to find element with ID 'MainDiv'. \n\
+                    {e}\n\nTraceback:\n{traceback.format_exc()}"
+        ctypes.windll.user32.MessageBoxW(0, err_msg, "Error", 0x10)
+        raise Exception(err_msg)
 
     selects = hours_div.find_elements(By.TAG_NAME, "select")
     ### ignoring friday
@@ -90,7 +98,7 @@ def fill_info(driver, conf):
         elif 'יום ו' not in span[0].text:
             no_friday_selects.append(select)
 
-    ###  handles select buttons (presence type)
+    ###  handles select buttons (presence type) and find the table lines to fill
     trs = []
     for select_elm in no_friday_selects:
         try:
@@ -105,8 +113,19 @@ def fill_info(driver, conf):
     start_time = start_time // 100 + start_time % 100 / 60
     hours = float(conf['min_hours'])
     num_to_time = lambda x: str(int(x // 1 % 24)).zfill(2) + str(int(x % 1 * 60)).zfill(2)
+    # iterate through each line
+    sleep_time = 2
     for tr in trs:
-        inputs = tr.find_elements(By.TAG_NAME, 'input')
+        # fetching relevant inputs
+        try:
+            tds = tr.find_elements(By.XPATH, './td')
+            input_start_time = tds[0].find_elements(By.TAG_NAME, 'input')[0]
+            input_end_time = tds[1].find_elements(By.TAG_NAME, 'input')[0]
+            input_project = tds[8].find_elements(By.TAG_NAME, 'input')[0]
+        except:
+            err_msg = f"Exception: Failed while trying to find input elements under tr."
+            ctypes.windll.user32.MessageBoxW(0, err_msg, "Error", 0x10)
+            raise Exception(err_msg)
 
         today_start_time = start_time
         today_hours = hours
@@ -122,13 +141,31 @@ def fill_info(driver, conf):
         # formatting and setting the time
         today_end_time = num_to_time(today_start_time + today_hours)
         today_start_time = num_to_time(today_start_time)
-        fill_time_field(inputs[0], today_start_time)
-        fill_time_field(inputs[1], today_end_time)
+        try:
+            fill_time_field(input_start_time, today_start_time)
+            fill_time_field(input_end_time, today_end_time)
+        except:
+            err_msg = f"Exception: Failed while trying fill in time in input."
+            ctypes.windll.user32.MessageBoxW(0, err_msg, "Error", 0x10)
+            raise Exception(err_msg)
 
         # setting project
-        inputs[5].send_keys(conf['project_code'])
-        time.sleep(2)
-        inputs[5].send_keys(Keys.ENTER)
+        try:
+            driver.execute_script("arguments[0].focus();", input_project)
+            input_project.send_keys(conf['project_code'])
+            time.sleep(sleep_time)
+            input_project.send_keys(Keys.ENTER)
+            # verify project was filled otherwise waits longer and try again
+            while not any(c.isalpha() for c in input_project.get_attribute('value')):
+                driver.execute_script("arguments[0].setAttribute('value', '');", input_project)
+                sleep_time += 1
+                input_project.send_keys(conf['project_code'])
+                time.sleep(sleep_time)
+                input_project.send_keys(Keys.ENTER)
+        except:
+            err_msg = f"Exception: Failed while trying fill in the project."
+            ctypes.windll.user32.MessageBoxW(0, err_msg, "Error", 0x10)
+            raise Exception(err_msg)
 
 
     ### saving data

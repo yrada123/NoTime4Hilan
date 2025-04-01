@@ -4,11 +4,20 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+import traceback
+import ctypes
 
 # finds the input fields
 def get_input_elements(driver):
     # Locate main view container
-    main_view = driver.find_element(By.ID, "mainViewPlaceholder")
+    try:
+        main_view = driver.find_element(By.ID, "mainViewPlaceholder")
+    except Exception as e:
+        err_msg = f"Exception: Failed while trying to find element with ID 'mainViewPlaceholder'. \n\
+            {e}\n\nTraceback:\n{traceback.format_exc()}"
+        ctypes.windll.user32.MessageBoxW(0, err_msg, "Error", 0x10)
+        raise Exception(err_msg)
+
 
     # Locate the input fields inside the main_view container
     input_fields = main_view.find_elements(By.TAG_NAME, "input")
@@ -16,6 +25,10 @@ def get_input_elements(driver):
     if len(input_fields) >= 2:  # Ensure there are at least two input fields
         username_input = input_fields[0]  # First input is usually username
         password_input = input_fields[1]  # Second input is usually password
+    else:
+        err_msg = f"Exception: username and password input fields were not found under 'mainViewPlaceholder'"
+        ctypes.windll.user32.MessageBoxW(0, err_msg, "Error", 0x10)
+        raise Exception(err_msg)
     return username_input, password_input
 
 def login(conf):
