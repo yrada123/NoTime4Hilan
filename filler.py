@@ -154,14 +154,26 @@ def fill_info(driver, conf):
             driver.execute_script("arguments[0].focus();", input_project)
             input_project.send_keys(conf['project_code'])
             time.sleep(sleep_time)
-            input_project.send_keys(Keys.ENTER)
+
+            # This clicks the item that the website itself has marked as 'highlighted'
+            try:
+                highlighted_item = driver.find_element(By.CSS_SELECTOR, "li[_highlighted='true']")
+                highlighted_item.click()
+            except:
+                print("Option was not found")
+
             # verify project was filled otherwise waits longer and try again
             while not any(c.isalpha() for c in input_project.get_attribute('value')):
                 driver.execute_script("arguments[0].setAttribute('value', '');", input_project)
                 sleep_time += 1
                 input_project.send_keys(conf['project_code'])
                 time.sleep(sleep_time)
-                input_project.send_keys(Keys.ENTER)
+                # This clicks the item that the website itself has marked as 'highlighted'
+                try:
+                    highlighted_item = driver.find_element(By.CSS_SELECTOR, "li[_highlighted='true']")
+                    highlighted_item.click()
+                except:
+                    print("Option was not found")
         except:
             err_msg = f"Exception: Failed while trying fill in the project."
             ctypes.windll.user32.MessageBoxW(0, err_msg, "Error", 0x10)

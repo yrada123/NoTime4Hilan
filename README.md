@@ -1,4 +1,7 @@
 # NoTime4Hilan
+## Compiling an .EXE
+  pyinstaller --onefile --windowed NoTime4Hilan.py
+
 ## conf.json
   This file is the way to fill your information so the program will be able to sign in to your account.<br>
   In addition there are plenty of hooks you can use to costumize its way of working.
